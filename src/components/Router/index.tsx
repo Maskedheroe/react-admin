@@ -24,7 +24,7 @@ const routes: Array<{
           "pages/Dashboard"
         )
     ),
-    path: "/dashboard",
+    path: "/welcome",
   },
   {
     component: lazy(
@@ -33,7 +33,7 @@ const routes: Array<{
           "pages/Table/EditableTable"
         )
     ),
-    path: "/table/editableTable",
+    path: "/business/chapter",
   },
   {
     component: lazy(

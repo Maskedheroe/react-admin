@@ -30,7 +30,7 @@ const Home: FC<IHome> = ({history}: IHome) => {
     setCollapsed(!collapsed);
   };
 
-  const initUserInfo = (fn: Function) => {
+  const initUserInfo = (fn: any) => {
     const userInfoStorage = localStorage.getItem('userInfo');
     const userInfo = userInfoStorage ? JSON.parse(userInfoStorage) : loginStore.getUserInfo();
     setUserInfo(userInfo)

@@ -6,7 +6,8 @@ import {
   AppstoreOutlined,
   FileExcelOutlined,
   MehOutlined,
-  HomeOutlined
+  HomeOutlined,
+  UserSwitchOutlined
 } from '@ant-design/icons';
 import style from './index.module.less'
 
@@ -40,6 +41,8 @@ const SlideBar: FC<ISlideBar> = ({
       return <MehOutlined />
     } else if (icon === 'dashboard') {
       return <HomeOutlined />
+    } else if (icon === 'system') {
+      return <UserSwitchOutlined/>
     }
   }
 
@@ -73,7 +76,6 @@ const SlideBar: FC<ISlideBar> = ({
           selectedKeys={selectedKeys}
           mode="inline"
           theme="dark"
-          // @ts-ignore
           onOpenChange={onOpenChange}
           onClick={onMenuItemClick}
         >
