@@ -24,8 +24,8 @@ const menus = async (config: AxiosRequestConfig): Promise<any> => {
 }
 
 const home: {
-  login: Function,
-  menus: Function,
+  login: any,
+  menus: any,
 } = {
   login,
   menus,

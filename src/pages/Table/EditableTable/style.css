@@ -1,0 +1,14 @@
+.bread_heade {
+  display: flex;
+  justify-content: space-between;
+}
+.refresh_btn {
+  text-align: center;
+  vertical-align: middle;
+  margin-right: 30px;
+}
+.add_btn {
+  text-align: center;
+  vertical-align: middle;
+  margin-right: 30px;
+}
