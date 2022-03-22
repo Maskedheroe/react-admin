@@ -11,16 +11,11 @@ import {
   Modal,
 } from "antd";
 import CustomBreadcrumb from "components/CommonBreadcrumb";
-import { getPageChapter } from "../../../services/chapter";
 import { ReloadOutlined, FileAddOutlined } from "@ant-design/icons";
-import useAddChapterEffect from "./useAddChapterEffect";
+import useChapterEffect from "./useChapterEffect";
+import { useEditEffect } from "./useEditEffect";
 
-type Chapter = {
-  id: string;
-  name: string;
-  courseId: string;
-};
-interface Item {
+export interface Item {
   id: string;
   name: string;
   courseId: string;
@@ -79,121 +74,72 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 const EditableTable = () => {
-  const [form] = Form.useForm();
-  // const [data, setData] = useState(originData);
-  const [editingKey, setEditingKey] = useState("");
-
   const {
     chapterList,
     visiable,
     confirmLoading,
+    courseId,
+    courseName,
     setChapterList,
     setVisiable,
     setConfirmLoading,
-    onOk,
     onCancel,
-  } = useAddChapterEffect();
+    onFinish,
+    setCourseId,
+    setCourseName,
+    getTotalChapter,
+  } = useChapterEffect();
 
-  const isEditing = (record: Item) => record.id === editingKey;
-
-  const edit = (record: Partial<Item> & { key: React.Key }) => {
-    form.setFieldsValue({ name: "", age: "", address: "", ...record });
-    setEditingKey(record.id as string);
+  const handleAddChapter = (): void => {
+    setVisiable(true);
   };
 
-  const cancel = () => {
-    setEditingKey("");
+  const handleRefresh = () => {
+    getTotalChapter();
   };
 
-  const save = async (key: React.Key) => {
-    try {
-      const row = (await form.validateFields()) as Item;
+  const { cancel, save, edit, editingKey, setEditingKey, form, columns, isEditing } = useEditEffect(
+    chapterList,
+    setChapterList,
+    editComponent,
+    getTotalChapter
+  );
 
-      const newData: Item[] = [...chapterList];
-      const index = newData.findIndex((item) => key === item.id);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row,
-        });
-        setChapterList(newData as any);
-        setEditingKey("");
-      } else {
-        newData.push(row);
-        setChapterList(newData as any);
-        setEditingKey("");
-      }
-    } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
-    }
-  };
-
+  function editComponent(record: Item, isEditing: (record: Item) => boolean) {
+    const editable = isEditing(record);
+    return editable ? (
+      <span>
+        <a
+          onClick={() => save(record.id)}
+          style={{ marginRight: 8 }}
+        >
+          保存
+        </a>
+        <Popconfirm
+          title="要取消编辑?"
+          onConfirm={cancel}
+          cancelText="否"
+          okText="是"
+        >
+          <a>取消</a>
+        </Popconfirm>
+      </span>
+    ) : (
+      <Typography.Link
+        disabled={editingKey !== ""}
+        onClick={() => edit(record)}
+      >
+        编辑
+      </Typography.Link>
+    );
+  }
   useEffect(() => {
     try {
-      getPageChapter("http://127.0.0.1:9000/business/admin/chapter/list", {
-        page: 1,
-        size: 20,
-      }).then((res) => {
-        setChapterList(
-          res.data.list.map((item: Chapter) => {
-            return { ...item, key: item.id };
-          })
-        );
-      });
+      getTotalChapter();
     } catch (error) {
       console.log(error);
     }
   }, []);
-
-  const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      width: "25%",
-      editable: true,
-    },
-    {
-      title: "名称",
-      dataIndex: "name",
-      width: "15%",
-      editable: true,
-    },
-    {
-      title: "课程ID",
-      dataIndex: "courseId",
-      width: "20%",
-      editable: true,
-    },
-    {
-      title: "operation",
-      dataIndex: "operation",
-      render: (_: any, record: Item) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <a
-              href="javascript:;"
-              onClick={() => save(record.id)}
-              style={{ marginRight: 8 }}
-            >
-              Save
-            </a>
-            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
-              <a>Cancel</a>
-            </Popconfirm>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            // onClick={() => edit(record)}
-          >
-            Edit
-          </Typography.Link>
-        );
-      },
-    },
-  ];
 
   const mergedColumns = columns.map((col) => {
     if (!col.editable) {
@@ -211,9 +157,7 @@ const EditableTable = () => {
       }),
     };
   });
-  const handleAddChapter = (): void => {
-    setVisiable(true);
-  };
+  
   return (
     <>
       <div className="bread_heade">
@@ -223,7 +167,11 @@ const EditableTable = () => {
             <FileAddOutlined />
             新增
           </Button>
-          <Button type="primary" className="refresh_btn">
+          <Button
+            type="primary"
+            className="refresh_btn"
+            onClick={handleRefresh}
+          >
             <ReloadOutlined />
             刷新
           </Button>
@@ -249,13 +197,47 @@ const EditableTable = () => {
         />
       </Form>
       <Modal
-        title="Title"
+        title="新增课程大章"
         visible={visiable}
-        onOk={onOk}
         confirmLoading={confirmLoading}
         onCancel={onCancel}
+        onOk={() => onFinish(courseName, courseId, handleRefresh)}
+        okText="提交"
+        cancelText="取消"
       >
-        <p>text</p>
+        <Form
+          name="basic"
+          labelCol={{ span: 8 }}
+          wrapperCol={{ span: 20 }}
+          initialValues={{ remember: true }}
+          autoComplete="off"
+        >
+          <Form.Item
+            label="名称"
+            name="courseName"
+            rules={[{ required: true, message: "Please input your username!" }]}
+          >
+            <Input
+              onChange={(e) => {
+                setCourseName(e.target.value);
+              }}
+              value={courseName}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="课程id"
+            name="courseId"
+            rules={[{ required: true, message: "Please input your password!" }]}
+          >
+            <Input
+              onChange={(e) => {
+                setCourseId(e.target.value);
+              }}
+              value={courseId}
+            />
+          </Form.Item>
+        </Form>
       </Modal>
     </>
   );
