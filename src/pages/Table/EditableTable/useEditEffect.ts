@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Item } from "./index";
+import { Item } from "./types";
 import { Form, FormInstance, Popconfirm, Typography, notification } from "antd";
-import { addChapter } from "../../../services/chapter";
+import { addChapter, deleteChapter } from "../../../services/chapter";
 
 type colType = {
   title: string;
@@ -20,6 +20,7 @@ interface EditReturnType {
   form: FormInstance;
   isEditing: (record: Item) => boolean;
   columns: colType;
+  handleDeleteChapter: (record: Partial<Item> & { key: React.Key }) => void
 }
 
 export const useEditEffect = (
@@ -61,6 +62,16 @@ export const useEditEffect = (
       console.log("Validate Failed:", errInfo);
     }
   };
+  const handleDeleteChapter = (record: Partial<Item> & { key: React.Key }) => {
+    try {
+      deleteChapter(record?.id || '')
+      getTotalChapter()
+      openNotification()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const columns: colType = [
     {
       title: "ID",
@@ -97,5 +108,6 @@ export const useEditEffect = (
     form,
     columns,
     isEditing,
+    handleDeleteChapter
   };
 };

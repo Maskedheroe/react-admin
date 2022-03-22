@@ -14,14 +14,8 @@ import CustomBreadcrumb from "components/CommonBreadcrumb";
 import { ReloadOutlined, FileAddOutlined } from "@ant-design/icons";
 import useChapterEffect from "./useChapterEffect";
 import { useEditEffect } from "./useEditEffect";
-
-export interface Item {
-  id: string;
-  name: string;
-  courseId: string;
-  key: string;
-}
-
+import { Confirm } from "./component/Confirm";
+import { Item } from "./types";
 // const originData: Item[] = [];
 // for (let i = 0; i < 100; i++) {
 //   originData.push({
@@ -98,7 +92,17 @@ const EditableTable = () => {
     getTotalChapter();
   };
 
-  const { cancel, save, edit, editingKey, setEditingKey, form, columns, isEditing } = useEditEffect(
+  const {
+    cancel,
+    save,
+    edit,
+    editingKey,
+    setEditingKey,
+    form,
+    columns,
+    isEditing,
+    handleDeleteChapter,
+  } = useEditEffect(
     chapterList,
     setChapterList,
     editComponent,
@@ -109,30 +113,41 @@ const EditableTable = () => {
     const editable = isEditing(record);
     return editable ? (
       <span>
-        <a
-          onClick={() => save(record.id)}
-          style={{ marginRight: 8 }}
-        >
-          保存
-        </a>
-        <Popconfirm
-          title="要取消编辑?"
-          onConfirm={cancel}
-          cancelText="否"
-          okText="是"
-        >
-          <a>取消</a>
-        </Popconfirm>
+        <Confirm save={save} cancel={cancel} record={record} />
       </span>
     ) : (
-      <Typography.Link
-        disabled={editingKey !== ""}
-        onClick={() => edit(record)}
-      >
-        编辑
-      </Typography.Link>
+      <div>
+        <Typography.Link
+          disabled={editingKey !== ""}
+          onClick={() => edit(record)}
+        >
+          编辑
+        </Typography.Link>
+        {/* <Typography.Link
+          style={{ marginLeft: '10px' }}
+          disabled={editingKey !== ""}
+          onClick={() => handleDeleteChapter(record)}
+        >
+          删除
+        </Typography.Link> */}
+        <Popconfirm
+          title="确定要删除该大章？"
+          onConfirm={() => handleDeleteChapter(record)}
+          onCancel={cancel}
+          okText="确认"
+          cancelText="取消"
+        >
+          <Typography.Link
+            style={{ marginLeft: "10px" }}
+            disabled={editingKey !== ""}
+          >
+            删除
+          </Typography.Link>
+        </Popconfirm>
+      </div>
     );
   }
+
   useEffect(() => {
     try {
       getTotalChapter();
@@ -157,7 +172,7 @@ const EditableTable = () => {
       }),
     };
   });
-  
+
   return (
     <>
       <div className="bread_heade">
