@@ -1,0 +1,4 @@
+.bread_heade {
+  display: flex;
+  justify-content: space-between;
+}

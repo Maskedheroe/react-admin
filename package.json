@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "react admin 后台管理系统解决方案",
   "scripts": {
-    "dev": "cross-env vite",
+    "dev": "vite --mode development",
     "build": "rimraf dist && cross-env tsc && vite build",
     "serve": "vite preview",
     "lint:script": "eslint -c .eslintrc.js 'src/**/*.ts' 'src/**/*.tsx' --cache --fix",
@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@types/hoist-non-react-statics": "^3.3.1",
-    "@types/node": "^16.4.10",
+    "@types/node": "^17.0.22",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.1.8",

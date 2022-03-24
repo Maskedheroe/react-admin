@@ -30,7 +30,7 @@ const routes: Array<{
     component: lazy(
       () =>
         import(
-          "pages/Table/EditableTable"
+          "pages/Table/Chapter"
         )
     ),
     path: "/business/chapter",
@@ -39,10 +39,10 @@ const routes: Array<{
     component: lazy(
       () =>
         import(
-          "pages/Table/DragSortingTable"
+          "pages/Section/index"
         )
     ),
-    path: "/table/dragSortingTable",
+    path: "/business/section",
   },
   {
     component: lazy(

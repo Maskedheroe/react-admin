@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, createRef } from "react";
 import "./style.css";
 import {
   Table,
@@ -7,23 +7,17 @@ import {
   Popconfirm,
   Form,
   Typography,
-  Button,
   Modal,
+  Spin,
+  FormInstance,
 } from "antd";
-import CustomBreadcrumb from "components/CommonBreadcrumb";
-import { ReloadOutlined, FileAddOutlined } from "@ant-design/icons";
 import useChapterEffect from "./useChapterEffect";
 import { useEditEffect } from "./useEditEffect";
 import { Confirm } from "./component/Confirm";
 import { Item } from "./types";
-// const originData: Item[] = [];
-// for (let i = 0; i < 100; i++) {
-//   originData.push({
-//     id: i.toString(),
-//     name: `Edrward ${i}`,
-//     courseId: 32
-//   });
-// }
+import { TableHead } from "../../../components/TableHead/index";
+import DeleteAction from "../../../components/DeleteAction";
+
 interface EditableCellProps extends React.HTMLAttributes<HTMLElement> {
   editing: boolean;
   dataIndex: string;
@@ -68,12 +62,14 @@ const EditableCell: React.FC<EditableCellProps> = ({
 };
 
 const EditableTable = () => {
+  const submitFormRef = createRef<FormInstance>();
   const {
     chapterList,
     visiable,
     confirmLoading,
     courseId,
     courseName,
+    loading,
     setChapterList,
     setVisiable,
     setConfirmLoading,
@@ -82,6 +78,7 @@ const EditableTable = () => {
     setCourseId,
     setCourseName,
     getTotalChapter,
+    setLoading,
   } = useChapterEffect();
 
   const handleAddChapter = (): void => {
@@ -123,27 +120,13 @@ const EditableTable = () => {
         >
           编辑
         </Typography.Link>
-        {/* <Typography.Link
-          style={{ marginLeft: '10px' }}
-          disabled={editingKey !== ""}
-          onClick={() => handleDeleteChapter(record)}
-        >
-          删除
-        </Typography.Link> */}
-        <Popconfirm
-          title="确定要删除该大章？"
-          onConfirm={() => handleDeleteChapter(record)}
-          onCancel={cancel}
-          okText="确认"
-          cancelText="取消"
-        >
-          <Typography.Link
-            style={{ marginLeft: "10px" }}
-            disabled={editingKey !== ""}
-          >
-            删除
-          </Typography.Link>
-        </Popconfirm>
+        <DeleteAction
+          cancel={cancel}
+          handleDelete={handleDeleteChapter}
+          record={record}
+          editingKey={editingKey}
+          title={"确定要删除该大章吗？"}
+        />
       </div>
     );
   }
@@ -175,48 +158,47 @@ const EditableTable = () => {
 
   return (
     <>
-      <div className="bread_heade">
-        <CustomBreadcrumb arr={["表格", "可编辑行表格"]} />
-        <div className="edit_area">
-          <Button type="primary" className="add_btn" onClick={handleAddChapter}>
-            <FileAddOutlined />
-            新增
-          </Button>
-          <Button
-            type="primary"
-            className="refresh_btn"
-            onClick={handleRefresh}
-          >
-            <ReloadOutlined />
-            刷新
-          </Button>
+      <TableHead handleAdd={handleAddChapter} handleRefresh={handleRefresh} />
+      {loading ? (
+        <div className="center_sping">
+          <Spin tip="加载中" />
         </div>
-      </div>
-      <Form form={form} component={false}>
-        <Table
-          components={{
-            body: {
-              cell: EditableCell,
-            },
-          }}
-          bordered
-          dataSource={chapterList}
-          columns={mergedColumns}
-          rowClassName="editable-row"
-          pagination={{
-            onChange: cancel,
-            position: ["bottomCenter"],
-            pageSize: 8,
-            showQuickJumper: true,
-          }}
-        />
-      </Form>
+      ) : (
+        <Form form={form} component={false}>
+          <Table
+            components={{
+              body: {
+                cell: EditableCell,
+              },
+            }}
+            bordered
+            dataSource={chapterList}
+            columns={mergedColumns}
+            rowClassName="editable-row"
+            pagination={{
+              onChange: cancel,
+              position: ["bottomCenter"],
+              pageSize: 8,
+              showQuickJumper: true,
+            }}
+          />
+        </Form>
+      )}
       <Modal
         title="新增课程大章"
         visible={visiable}
         confirmLoading={confirmLoading}
         onCancel={onCancel}
-        onOk={() => onFinish(courseName, courseId, handleRefresh)}
+        onOk={() => {
+          submitFormRef.current
+            ?.validateFields()
+            .then(() => {
+              onFinish(courseName, courseId, handleRefresh);
+            })
+            .catch((info: string) => {
+              console.log("Error", info);
+            });
+        }}
         okText="提交"
         cancelText="取消"
       >
@@ -226,11 +208,12 @@ const EditableTable = () => {
           wrapperCol={{ span: 20 }}
           initialValues={{ remember: true }}
           autoComplete="off"
+          ref={submitFormRef}
         >
           <Form.Item
             label="名称"
             name="courseName"
-            rules={[{ required: true, message: "Please input your username!" }]}
+            rules={[{ required: true, message: "名称不能为空" }]}
           >
             <Input
               onChange={(e) => {
@@ -241,9 +224,9 @@ const EditableTable = () => {
           </Form.Item>
 
           <Form.Item
-            label="课程id"
+            label="课程ID"
             name="courseId"
-            rules={[{ required: true, message: "Please input your password!" }]}
+            rules={[{ required: true, message: "课程ID不能为空" }]}
           >
             <Input
               onChange={(e) => {

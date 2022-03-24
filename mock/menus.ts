@@ -40,9 +40,9 @@ const getMenus = (roleType: string) => {
             key: "/business/chapter",
           },
           {
-            component: "拖拽排序表格",
-            path: "/table/dragSortingTable",
-            key: "table/dragSortingTable",
+            component: "小节管理",
+            path: "/business/section",
+            key: "/business/section",
           },
         ],
       },
@@ -133,14 +133,14 @@ const getMenus = (roleType: string) => {
           //   key: '/table/basicTable'
           // },
           {
-            component: "可编辑行表格",
-            path: "/admin/chapter",
-            key: "admin/chapter",
+            component: "大章管理",
+            path: "/business/chapter",
+            key: "/business/chapter",
           },
           {
-            component: "拖拽排序表格",
-            path: "/table/dragSortingTable",
-            key: "table/dragSortingTable",
+            component: "小节管理",
+            path: "/business/section",
+            key: "/business/section",
           },
         ],
       },

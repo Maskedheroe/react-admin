@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { addChapter } from "../../../services/chapter";
 import { getPageChapter } from "../../../services/chapter";
-import { Form } from 'antd';
+import { Form, FormInstance } from "antd";
 
 type Chapter = {
   id: string;
@@ -15,6 +15,7 @@ const useChapterEffect = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [courseName, setCourseName] = useState("");
   const [courseId, setCourseId] = useState("");
+  const [loading, setLoading] = useState(false);
   const onCancel = () => {
     setVisiable(false);
   };
@@ -35,17 +36,25 @@ const useChapterEffect = () => {
     }
   };
   const getTotalChapter = () => {
-    getPageChapter("http://127.0.0.1:9000/business/admin/chapter/list", {
-      page: 1,
-      size: 20,
-    }).then((res) => {
-      const resp = res.data;
-      setChapterList(
-        resp.content.list.map((item: Chapter) => {
-          return { ...item, key: item.id };
-        })
-      );
-    });
+    try {
+      setLoading(true);
+      getPageChapter("/list", {
+        page: 1,
+        size: 20,
+      }).then((res) => {
+        setTimeout(() => {
+          const resp = res.data;
+          setChapterList(
+            resp.content.list.map((item: Chapter) => {
+              return { ...item, key: item.id };
+            })
+          );
+          setLoading(false);
+        }, 500);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
   return {
     chapterList,
@@ -53,6 +62,8 @@ const useChapterEffect = () => {
     confirmLoading,
     courseName,
     courseId,
+    loading,
+    setLoading,
     setChapterList,
     setVisiable,
     setConfirmLoading,
@@ -60,7 +71,7 @@ const useChapterEffect = () => {
     onFinish,
     setCourseName,
     setCourseId,
-    getTotalChapter
+    getTotalChapter,
   };
 };
 export default useChapterEffect;
