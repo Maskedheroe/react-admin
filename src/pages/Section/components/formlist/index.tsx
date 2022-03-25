@@ -17,8 +17,8 @@ export default function FormList({ titleList }: { titleList: title[] }) {
           >
             {item.label === "收费" ? (
               <Select>
-                <Option value="free">免费</Option>
-                <Option value="charge">收费</Option>
+                <Option value="F">免费</Option>
+                <Option value="C">收费</Option>
               </Select>
             ) : (
               <Input />

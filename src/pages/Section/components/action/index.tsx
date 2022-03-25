@@ -1,26 +1,26 @@
 import React, { useState } from "react";
 import { deleteAction } from "../../../../services/section";
 import "./style.css";
-import { notification } from "antd";
+import { notification, Typography } from "antd";
 import DeleteAction from "../../../../components/DeleteAction";
 
 export const Action = ({
   id,
   reload,
   openNotification,
+  edit,
+  disabled,
 }: {
   id: string;
   reload: () => void;
   openNotification: (text: string) => void;
+  edit: (record: any) => void;
+  disabled: boolean;
 }) => {
   const [editingKey, setEditingKey] = useState<string>("");
 
   const cancel = () => {
     setEditingKey("");
-  };
-
-  const handleEdit = () => {
-    alert("edit");
   };
   const handleDelete = (sectionId: string) => {
     try {
@@ -34,9 +34,12 @@ export const Action = ({
   };
   return (
     <div className="action">
-      <span className="edit" onClick={handleEdit}>
+      <Typography.Link
+        disabled={editingKey !== ""}
+        onClick={edit}
+      >
         编辑
-      </span>
+      </Typography.Link>
       <DeleteAction
         editingKey={editingKey}
         cancel={cancel}

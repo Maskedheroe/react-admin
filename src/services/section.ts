@@ -6,19 +6,7 @@ interface Page {
   page: number;
   size: number;
 }
-
-type Section = {
-  id: string;
-  title: string;
-  courseId: string;
-  chapterId: string;
-  video: string;
-  time: number;
-  charge: string;
-  sort: number;
-  createdAt: number;
-  updatedAt: number;
-}
+ 
 
 const ENV = import.meta.env.VITE_BASE_API
 
@@ -32,7 +20,7 @@ export const getPageChapter = (url: string, params: Page): Promise<any> => {
   return post(`${CHAPTER}${url}`, params);
 };
 
-export const addSection = (params: Section, url?: string): Promise<any> => {
+export const addSection = <T>(params: T, url?: string): Promise<any> => {
   if (!url) {
     url = `${CHAPTER}/save`
   }
